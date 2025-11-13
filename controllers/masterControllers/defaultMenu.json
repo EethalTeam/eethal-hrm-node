@@ -1,0 +1,49 @@
+{
+  "superadmin": [
+    "68875b492de57ed069ddec3b",
+    "689c78f614a3f183518ecda2",
+    "689c798146ee7e7d5e863b97",
+    "689c799446ee7e7d5e863b9c",
+    "689c79ac46ee7e7d5e863ba1",
+    "689c79cd46ee7e7d5e863ba6",
+    "689c79e846ee7e7d5e863bab",
+    "689c7a0446ee7e7d5e863bb0",
+    "689c7a1646ee7e7d5e863bb5",
+    "689c7a2c46ee7e7d5e863bba",
+    "689c7a5a46ee7e7d5e863bbf",
+    "689c7a7846ee7e7d5e863bc4",
+    "689c7a8f46ee7e7d5e863bc8",
+    "689c7ab446ee7e7d5e863bcd",
+    "689c7b2746ee7e7d5e863bd3",
+    "689c7b4846ee7e7d5e863bd8"
+  ],
+
+  "admin": [
+    "68875b492de57ed069ddec3b",
+    "689c78f614a3f183518ecda2",
+    "689c798146ee7e7d5e863b97",
+    "689c799446ee7e7d5e863b9c",
+    "689c79ac46ee7e7d5e863ba1",
+    "689c79cd46ee7e7d5e863ba6",
+    "689c79e846ee7e7d5e863bab",
+    "689c7a0446ee7e7d5e863bb0",
+    "689c7a1646ee7e7d5e863bb5",
+    "689c7a2c46ee7e7d5e863bba",
+    "689c7a5a46ee7e7d5e863bbf",
+    "689c7a7846ee7e7d5e863bc4",
+    "689c7a8f46ee7e7d5e863bc8",
+    "689c7ab446ee7e7d5e863bcd",
+    "689c7b2746ee7e7d5e863bd3",
+    "689c7b4846ee7e7d5e863bd8"
+  ],
+
+ "agent": [
+    "68875b492de57ed069ddec3b",
+    "689c78f614a3f183518ecda2",
+    "689c798146ee7e7d5e863b97",
+    "689c799446ee7e7d5e863b9c",
+    "689c79ac46ee7e7d5e863ba1",
+    "689c79cd46ee7e7d5e863ba6"
+]
+
+}
