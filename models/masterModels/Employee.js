@@ -37,7 +37,7 @@ const employeeSchema = new mongoose.Schema({
   },
   roleId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Role"         // master table
+    ref: "RoleBased"         // master table
   },
   statusId: {
     type: mongoose.Schema.Types.ObjectId,

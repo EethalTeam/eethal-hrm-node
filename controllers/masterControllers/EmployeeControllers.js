@@ -262,7 +262,8 @@ exports.getAllWorkLocations = async (req, res) => {
 // GET ALL Role
 exports.getAllRoles = async (req, res) => {
   try {
-    const role = await Role.find();
+    const role = await RoleBased.find();
+    console.log(role,"role")
     res.status(200).json(role);
   } catch (error) {
     console.error(error);

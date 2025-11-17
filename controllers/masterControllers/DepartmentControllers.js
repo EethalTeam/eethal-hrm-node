@@ -5,7 +5,11 @@ const Department = require("../../models/masterModels/Department");
 exports.createDepartment = async (req, res) => {
   try {
     const {departmentName,departmentHead} = req.body
-    const department = new Department({departmentName,departmentHead});
+    let save={departmentName}
+    if(departmentHead){
+      save.departmentHead=departmentHead
+    }
+    const department = new Department(save);
     await department.save();
     res.status(201).json({ message: "Department created successfully", department });
   } catch (error) {

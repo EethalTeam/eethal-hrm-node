@@ -52,8 +52,8 @@ app.get('/privacy', (req, res) => {
 app.use("/webhook", webhookRoutes);
 app.use('/getAllCallLogs', LeadController.handleGenericWebhook)
 app.use('/api', authRoutes);
-app.use('/api', checkLogin, masterRoutes);
-app.use('/api',checkLogin, mainRoutes);
+app.use('/api', masterRoutes);
+app.use('/api', mainRoutes);
 
 app.get('/test', (req, res) => {
   res.send("Testing mongo db url", process.env.MONGODB_URI);
