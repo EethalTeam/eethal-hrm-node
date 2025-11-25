@@ -336,44 +336,43 @@ exports.deleteEmployee = async (req, res) => {
 // LOGIN Employee
 exports.loginEmployee = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body;    
 
-    // 1. Reject if request is from mobile device
     const userAgent = req.headers["user-agent"] || "";
-    const isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent);
-    if (isMobile) {
-      return res.status(403).json({ message: "Login from mobile devices is not allowed" });
-    }
+    const isMobileUA = /mobile|android|iphone|ipad|phone/i.test(userAgent);
 
-    // 2. Find employee by email
+    const isMobileHardware = req.headers["x-is-mobile-hardware"] === "true";
+
+    if (isMobileUA || isMobileHardware) {
+      return res.status(403).json({ 
+        message: "Login from mobile devices (including Desktop Mode) is not allowed." 
+      });
+    }
     const employee = await Employee.findOne({ email: email }).populate("roleId", "RoleName");
     if (!employee) {
       return res.status(404).json({ message: "Employee not found" });
     }
 
-    // 3. Check if employee is already logged in
+    // 4. Check if employee is already logged in (Optional - currently commented out)
     // if (employee.isCurrentlyLoggedIn) {
     //   return res.status(403).json({ message: "Employee is already logged in" });
     // }
 
-    // 4. Compare plain password (since not hashing yet)
     if (employee.password !== password) {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // 5. Mark employee as logged in
     employee.isCurrentlyLoggedIn = true;
     await employee.save();
 
-    // 6. Success
     res.status(200).json({
       message: "Login successful",
       employee: {
         _id: employee._id,
-        employeeCode:employee.code?employee.code :'',
+        employeeCode: employee.code ? employee.code : '',
         name: employee.name,
         email: employee.email,
-        role:employee.roleId.RoleName,
+        role: employee.roleId.RoleName,
         isCurrentlyLoggedIn: employee.isCurrentlyLoggedIn
       },
     });
