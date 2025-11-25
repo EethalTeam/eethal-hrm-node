@@ -133,9 +133,9 @@ exports.updateNotificationStatus = async (req, res) => {
     }
 
     const STATUS = {
-      approved: "68b6a2610c502941d03c6372",
-      rejected: "68b6a2680c502941d03c6376",
-      complete: "68b5a26d88e62ec178bb292b"
+      approved: "69254b0aa48e61da37c0a29b",
+      rejected: "69254b11a48e61da37c0a2a2",
+      complete: "69254d16a48e61da37c0a321"
     };
 
     const newStatus = action === "approve" ? "approved" : "rejected";

@@ -200,7 +200,7 @@ exports.importLeads = async (req, res) => {
     
     const leadsToInsert = [];
     const invalidRows = [];
-    const LEADSTATUS_ID = new mongoose.Types.ObjectId("68b44de801edf550680e0b6d")
+    const LEADSTATUS_ID = new mongoose.Types.ObjectId("69254c21a48e61da37c0a2dc")
 
     // --- FIX 1: Get the last lead ONCE, before the loop ---
     const lastLead = await Lead.findOne({}, {}, { sort: { 'createdAt': -1 } });

@@ -214,8 +214,8 @@ exports.updateTaskStatus = async (req, res) => {
 
     // Mapping status to TaskStatus IDs
     const statusMap = {
-      Start: { id: "68b5a26288e62ec178bb2927", message: "Task Started" },     // In Progress
-      Pause: { id: "68b5a25b88e62ec178bb2923", message: "Task Paused" },      // To Do
+      Start: { id: "69254d07a48e61da37c0a31d", message: "Task Started" },     // In Progress
+      Pause: { id: "69254cefa48e61da37c0a317", message: "Task Paused" },      // To Do
       // Complete: { id: "68b5a26d88e62ec178bb292b", message: "Task Completed" } // Completed
     };
         const updateObj = {};

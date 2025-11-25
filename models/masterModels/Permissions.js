@@ -37,7 +37,7 @@ const PermissionRequestSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "RequestStatus",
       required: true,
-      default: new mongoose.Types.ObjectId("68b6a2460c502941d03c6367")
+      default: new mongoose.Types.ObjectId("692550a8a48e61da37c0a436") //pending
     },
     isActive: {
       type: Boolean,

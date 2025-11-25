@@ -64,9 +64,9 @@ exports.createEmployee = async (req, res) => {
 
     // ✅ Step 2: Assign default leave balances using provided IDs
     const leaveBalances = [
-      { leaveTypeId: "68b6a07021723b01602c4170", totalAllocated: 12, remaining: 12 }, // Annual Leave
-      { leaveTypeId: "68b6a00021723b01602c416b", totalAllocated: 10, remaining: 10 }, // Sick Leave
-      { leaveTypeId: "68b69fee21723b01602c4167", totalAllocated: 12, remaining: 12 }  // Casual Leave
+      { leaveTypeId: "6925467ba48e61da37c0a220", totalAllocated: 12, remaining: 12 }, // Annual Leave
+      { leaveTypeId: "69254608a48e61da37c0a1f5", totalAllocated: 10, remaining: 10 }, // Sick Leave
+      { leaveTypeId: "692545eda48e61da37c0a1e8", totalAllocated: 12, remaining: 12 }  // Casual Leave
     ];
 
     // ✅ Step 3: Save LeaveBalance
@@ -263,7 +263,6 @@ exports.getAllWorkLocations = async (req, res) => {
 exports.getAllRoles = async (req, res) => {
   try {
     const role = await RoleBased.find();
-    console.log(role,"role")
     res.status(200).json(role);
   } catch (error) {
     console.error(error);

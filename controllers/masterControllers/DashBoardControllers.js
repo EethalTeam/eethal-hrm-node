@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const PermissionRequest = require('../../models/masterModels/Permissions');
 const LeaveRequest = require('../../models/masterModels/LeaveRequest');
 
-const APPROVED_PERMISSION_STATUS_ID = new mongoose.Types.ObjectId("68b6a2610c502941d03c6372");
+const APPROVED_PERMISSION_STATUS_ID = new mongoose.Types.ObjectId("69254b0aa48e61da37c0a29b");
 
 exports.getTodaysAbsentees = async (req, res) => {
   try {
