@@ -21,7 +21,7 @@ exports.createProject = async (req, res) => {
     if (!projectName) {
       return res.status(400).json({ message: "projectName is required" });
     }
-   const alreadyExist=Project.findOne({projectName:projectName})
+   const alreadyExist=await Project.findOne({projectName:projectName})
    if(alreadyExist){
     return res.status(400).json({ message: "Project already exists" });
    }

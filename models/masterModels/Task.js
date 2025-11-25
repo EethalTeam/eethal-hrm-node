@@ -28,11 +28,11 @@ const TaskSchema = new mongoose.Schema(
     },
     taskStatusId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "TaskStatus", // Pending, In Progress, Completed
+      ref: "TaskStatus",
     },
     taskPriorityId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "TaskPriority", // High, Medium, Low
+      ref: "TaskPriority",
     },
     assignedTo: [
       {
@@ -66,6 +66,29 @@ const TaskSchema = new mongoose.Schema(
       {
         type: String,
         trim: true,
+      },
+    ],
+    workLogs: [
+      {
+        employeeId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Employee",
+          required: true,
+        },
+        startTime: {
+          type: Date,
+          required: true,
+        },
+        endTime: {
+          type: Date
+        },
+        hoursWorked: {
+          type: Number
+        },
+        logDescription: {
+          type: String,
+          trim: true,
+        },
       },
     ],
   },

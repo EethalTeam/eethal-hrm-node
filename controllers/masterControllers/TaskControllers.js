@@ -1,5 +1,6 @@
 // controllers/taskController.js
 const Task = require("../../models/masterModels/Task");
+const TaskStatus = require("../../models/masterModels/TaskStatus")
 const Notification = require('../../models/masterModels/Notifications')
 const Employee = require('../../models/masterModels/Employee')
 const { sendWhatsAppTemplate } = require('../../controllers/masterControllers/WhatsAppControllers')
@@ -23,7 +24,6 @@ exports.createTask = async (req, res) => {
       description,
       startDate,
       dueDate,
-      taskStatusId,
       taskPriorityId,
       assignees,
       createdBy,
@@ -38,7 +38,7 @@ exports.createTask = async (req, res) => {
     if (!assignees || !Array.isArray(assignees) || assignees.length === 0) {
       return res.status(400).json({ message: "assignees must be a non-empty array of employee IDs" });
     }
-
+    const taskStatus =await TaskStatus.findOne({name:'To Do'})
     // --- 2. Fetch Common Data Once ---
     const createdEmployee = await Employee.findOne({ _id: createdBy });
     if (!createdEmployee) {
@@ -59,9 +59,9 @@ exports.createTask = async (req, res) => {
         description,
         startDate,
         dueDate,
-        taskStatusId,
+        taskStatusId:taskStatus._id,
         taskPriorityId,
-        assignedTo: assigneeId, // <-- Set the individual assignee here
+        assignedTo: assigneeId,
         createdBy,
         reqLeadCount,
         compLeadCount
@@ -206,71 +206,107 @@ exports.updateTask = async (req, res) => {
 
 exports.updateTaskStatus = async (req, res) => {
   try {
-    const { taskId, status, feedback, progressDetails, reasonForPending ,reqLeadCount,compLeadCount} = req.body;
+    const { taskId, status, feedback, progressDetails, reasonForPending, reqLeadCount, compLeadCount } = req.body;
 
     if (!taskId || !status) {
       return res.status(400).json({ message: "Task ID and status are required" });
     }
 
-    // Mapping status to TaskStatus IDs
-    const statusMap = {
-      Start: { id: "69254d07a48e61da37c0a31d", message: "Task Started" },     // In Progress
-      Pause: { id: "69254cefa48e61da37c0a317", message: "Task Paused" },      // To Do
-      // Complete: { id: "68b5a26d88e62ec178bb292b", message: "Task Completed" } // Completed
-    };
-        const updateObj = {};
-        const selectedStatus = statusMap[status];
-    if(status === 'Complete'){
- const taskname=await Task.findOne({_id:taskId})
-    const assignedEmployee=await Employee.findOne({_id:taskname.assignedTo})
-        // 2️⃣ Create a notification for the approver
-        const notification = await Notification.create({
-          type: "task-complete",
-          message: `Task Completed by ${assignedEmployee.name} - ${taskname.taskName} (${taskname.description}), FeedBack:${feedback}`,
-          fromEmployeeId: taskname.assignedTo,
-          toEmployeeId: taskname.createdBy,
-          status: "unseen",
-          meta: {
-            taskId: taskId
-          }
-        });
-        // 3️⃣ Emit notification via Socket.IO
-        const io = req.app.get("socketio");
-        if (io && taskname.createdBy) {
-          io.to(taskname.createdBy.toString()).emit("receiveNotification", notification);
-        }
-    }else{
-    if (!selectedStatus && status !== 'Complete') {
-      return res.status(400).json({ message: "Invalid status value" });
-    }
-
-    // Build update object
-    updateObj.taskStatusId = selectedStatus.id ;
-    }    
-    if (feedback) updateObj.feedback = feedback;
-    if (compLeadCount) updateObj.compLeadCount = compLeadCount
-
-    const pushObj = {};
-    if (progressDetails) pushObj.progressDetails = `${progressDetails} - ${getIndiaDateTime()}`;
-    if (reasonForPending) pushObj.reasonForPending = reasonForPending;
-    
-    if (Object.keys(pushObj).length > 0) {
-      updateObj.$push = pushObj;
-    }
-
-    const task = await Task.findByIdAndUpdate(taskId, updateObj, { new: true })
-      .populate("projectId", "projectName")
-      .populate("taskStatusId", "name")
-      .populate("assignedTo", "name email");
-
+    const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
 
+    const statusMap = {
+      Start: { id: "69254d07a48e61da37c0a31d", message: "Task Started" },     // In Progress
+      Pause: { id: "69254cefa48e61da37c0a317", message: "Task Paused" },      // To Do
+      Complete: { id: "69254d16a48e61da37c0a321", message: "Task Completed" } // Completed
+    };
+
+    const selectedStatus = statusMap[status];
+    if (!selectedStatus && status !== 'Complete') {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+    const currentTime = new Date();
+
+    if (status === 'Start') {
+      task.workLogs.push({
+        employeeId: task.assignedTo[0], // Assuming the first assignee is performing the task
+        startTime: currentTime,
+      });
+    } 
+    else if (status === 'Pause' || status === 'Complete') {
+      // Find the last log entry that hasn't been closed yet
+      const lastLogIndex = task.workLogs.length - 1;
+      
+      if (lastLogIndex >= 0) {
+        const lastLog = task.workLogs[lastLogIndex];
+        
+        // Only update if it has a start time but NO end time
+        if (lastLog.startTime && !lastLog.endTime) {
+          lastLog.endTime = currentTime;
+          
+          // Calculate duration in milliseconds
+          const durationMs = lastLog.endTime - lastLog.startTime;
+          
+          // Convert to Hours (e.g., 1.5 hours)
+          const hours = durationMs / (1000 * 60 * 60); 
+          lastLog.hoursWorked = parseFloat(hours.toFixed(2)); // Round to 2 decimals
+        }
+      }
+    }
+
+    if (status === 'Complete') {
+      // 2. Notification Logic for Completion
+      const assignedEmployee = await Employee.findOne({ _id: task.assignedTo[0] });
+      
+      const notification = await Notification.create({
+        type: "task-complete",
+        message: `Task Completed by ${assignedEmployee ? assignedEmployee.name : 'Employee'} - ${task.taskName} (${task.description}), FeedBack:${feedback || ''}`,
+        fromEmployeeId: task.assignedTo[0],
+        toEmployeeId: task.createdBy,
+        status: "unseen",
+        meta: { taskId: taskId }
+      });
+
+      // 3. Emit notification
+      const io = req.app.get("socketio");
+      if (io && task.createdBy) {
+        io.to(task.createdBy.toString()).emit("receiveNotification", notification);
+      }
+      
+      // Update Status ID
+      task.taskStatusId = selectedStatus.id;
+    } else {
+      // Update Status ID for Start/Pause
+      task.taskStatusId = selectedStatus.id;
+    }
+
+    // --- GENERIC UPDATES ---
+    if (feedback) task.feedback = feedback;
+    if (compLeadCount) task.compLeadCount = compLeadCount;
+
+    // Handle array pushes manually since we are using .save()
+    if (progressDetails) {
+      task.progressDetails.push(`${progressDetails} - ${new Date().toLocaleString('en-IN')}`);
+    }
+    if (reasonForPending) {
+      task.reasonForPending.push(reasonForPending);
+    }
+
+    // 4. Save the document (This triggers the updates + logic above)
+    await task.save();
+
+    // 5. Populate for response
+    await task.populate("projectId", "projectName");
+    await task.populate("taskStatusId", "name");
+    await task.populate("assignedTo", "name email");
+
     res.status(200).json({
-      message: status !== 'Complete' ? selectedStatus.message : 'Task Completion requested',
+      message: selectedStatus.message,
       task,
     });
+
   } catch (error) {
     console.error("Update Task Status Error:", error);
     res.status(500).json({ message: "Internal Server Error", error: error.message });
